@@ -327,9 +327,21 @@ return WEXITSTATUS(status);  // WRONG! Check WIFEXITED first
 Answer all four questions in your submission:
 
 1. What happens to the child's memory when `exec()` is called?
+
+When exec() is called, the child process’s memory is completely replaced by the new program that it is supposed to run. All of the old code, variables, and stack data from the child are erased, and the instructions and data of the new program are loaded into its memory. The process keeps the same process ID or PID, but everything it was before is gone, and it now becomes the new program entirely.
+
 2. Why do we need both `fork()` and `exec()`? Why not one system call?
+
+We need both fork() and exec() because they do different jobs that work together. The fork() call creates a new process that is a copy of the parent while exec() replaces that process’s memory with a new program. Using both allows the parent to keep running and manage the child process, such as waiting for it or starting other tasks. If there were only one system call, the parent would disappear as soon as it ran a new program which would make multitasking and process control impossible.
+
+
 3. What happens if you call `exec()` in the parent process instead of the child?
+
+If exec() is called in the parent process instead of the child, the parent itself gets replaced by the new program. That means the original parent process for example, a command shell would stop existing and turn into whatever command was executed. As a result, the shell would no longer be able to take more commands or manage other child processes.
+
 4. Why must the child call `exit()` instead of return after a failed `exec()`?
+
+The child must call exit() instead of return after a failed exec() because returning would cause the child to continue running the parent’s code which then leads to two processes executing the same logic. This could create unexpected behavior, duplicated output, or errors. Calling exit(1) immediately stops the child and clearly signals to the parent that the command execution failed.
 
 #### Compilation and Execution
 
